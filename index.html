@@ -28,21 +28,14 @@ padding:15px;
 }
 
 .app{
-
 width:100%;
 max-width:420px;
-
 background:rgba(255,255,255,0.15);
 backdrop-filter:blur(20px);
-
 border-radius:25px;
-
 box-shadow:0 20px 50px rgba(0,0,0,0.3);
-
 padding:20px;
-
 color:white;
-
 }
 
 /* HEADER */
@@ -51,7 +44,7 @@ color:white;
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-bottom:18px;
+margin-bottom:12px;
 }
 
 .title{
@@ -64,30 +57,41 @@ cursor:pointer;
 font-size:20px;
 }
 
+/* CAMPUS SELECTOR */
+
+.campusBox{
+margin-bottom:12px;
+}
+
+.campusBox select{
+width:100%;
+padding:12px;
+border:none;
+border-radius:12px;
+background:rgba(255,255,255,0.2);
+color:white;
+font-size:15px;
+outline:none;
+}
+
 /* SEARCH */
 
 .searchBox{
-
 background:rgba(255,255,255,0.2);
 padding:12px;
 border-radius:12px;
-
 display:flex;
 align-items:center;
 gap:10px;
-
 }
 
 .searchBox input{
-
 background:none;
 border:none;
 outline:none;
-
 color:white;
 font-size:15px;
 width:100%;
-
 }
 
 .searchBox input::placeholder{
@@ -97,116 +101,85 @@ color:#ddd;
 /* BUTTON */
 
 .btn{
-
 margin-top:12px;
-
 width:100%;
 padding:14px;
-
 border:none;
-
 border-radius:12px;
-
 background:white;
 color:#333;
-
 font-weight:500;
-
 font-size:15px;
-
 cursor:pointer;
-
 }
 
 /* PHOTO AREA */
 
 .photoArea{
-
 margin-top:20px;
-
 display:flex;
 justify-content:center;
 align-items:center;
-
 min-height:230px;
-
 text-align:center;
-
 flex-direction:column;
-
 }
 
-img{
-
+.photoArea img{
 max-width:100%;
 max-height:260px;
-
 object-fit:contain;
-
 border-radius:18px;
-
 box-shadow:0 10px 25px rgba(0,0,0,0.35);
+}
 
+/* PLACEHOLDER */
+
+.placeholder{
+text-align:center;
+opacity:0.8;
+font-size:15px;
+}
+
+.placeholder p{
+margin-top:10px;
 }
 
 /* ERROR */
 
 .error{
-
 margin-top:10px;
-
 color:#ffd3d3;
-
 display:none;
-
 }
 
 /* ACTION BUTTONS */
 
 .actions{
-
 margin-top:18px;
-
 display:flex;
-
 gap:8px;
-
 }
 
 .actions button{
-
 flex:1;
-
 padding:12px;
-
 border:none;
-
 border-radius:10px;
-
 background:rgba(255,255,255,0.25);
-
 color:white;
-
 font-size:13px;
-
 cursor:pointer;
-
 }
 
 /* FOOTER NAV */
 
 .footer{
-
 margin-top:20px;
-
 display:flex;
-
 justify-content:space-around;
-
 font-size:13px;
-
 opacity:.9;
-
 }
 
 .footer div{
@@ -221,80 +194,78 @@ cursor:pointer;
 
 <div class="app">
 
+<!-- HEADER -->
 <div class="header">
-
 <div class="title">🎓 Student Finder</div>
-
 <div class="icon" onclick="toggleMode()">🌙</div>
-
 </div>
 
+<!-- CAMPUS SELECTOR -->
+<div class="campusBox">
+<select id="campus">
+<option value="aec">AEC Campus</option>
+<option value="acet">ACET Campus</option>
+</select>
+</div>
+
+<!-- SEARCH -->
 <div class="searchBox">
-
 🔎
-
-<input id="roll" placeholder="Enter Roll Number">
-
+<input id="roll" placeholder="Enter Roll Number" onkeypress="if(event.key==='Enter') loadPhoto()">
 </div>
 
 <button class="btn" onclick="loadPhoto()">Search Photo</button>
 
+<!-- PHOTO AREA -->
 <div class="photoArea">
-
-<img 
-id="photo"
-src="https://api.dicebear.com/7.x/avataaars/png?seed=student"
->
-
+<img id="photo" src="https://api.dicebear.com/7.x/avataaars/png?seed=student">
 <div class="error" id="error">Photo not found</div>
-
 </div>
 
+<!-- ACTIONS -->
 <div class="actions">
-
 <button onclick="downloadPhoto()">Download</button>
-
 <button onclick="copyURL()">Copy Link</button>
-
 <button onclick="clearPhoto()">Clear</button>
-
 </div>
 
+<!-- FOOTER -->
 <div class="footer">
-
 <div onclick="goHome()">🏠 Home</div>
-
 <div onclick="focusSearch()">🔍 Search</div>
-
 <div onclick="saveFav()">⭐ Save</div>
-
 </div>
 
 </div>
 
 <script>
-
 const input=document.getElementById("roll")
 const img=document.getElementById("photo")
 const error=document.getElementById("error")
 
 let currentURL=""
 
-input.addEventListener("keypress",e=>{
+input.addEventListener("keypress", e=>{
 if(e.key==="Enter") loadPhoto()
 })
 
 function loadPhoto(){
-
 const roll=input.value.trim()
-
 if(!roll) return
 
-const url=`https://info.aec.edu.in/aec/StudentPhotos/${roll}.jpg`
+const campus=document.getElementById("campus").value
+let url=""
+
+if(campus==="aec"){
+url=`https://info.aec.edu.in/aec/StudentPhotos/${roll}.jpg`
+}
+if(campus==="acet"){
+url=`https://info.aec.edu.in/acet/StudentPhotos/${roll}.jpg`
+}
 
 currentURL=url
-
 img.src=url
+error.style.display="none"
 
 img.onload=()=>{
 error.style.display="none"
@@ -304,41 +275,26 @@ img.onerror=()=>{
 error.style.display="block"
 img.src="https://api.dicebear.com/7.x/avataaars/png?seed=student"
 }
-
 }
 
 function downloadPhoto(){
-
 if(!currentURL) return
-
 const a=document.createElement("a")
-
 a.href=currentURL
-
 a.download="student-photo.jpg"
-
 a.click()
-
 }
 
 function copyURL(){
-
 if(!currentURL) return
-
 navigator.clipboard.writeText(currentURL)
-
 alert("Copied")
-
 }
 
 function clearPhoto(){
-
 input.value=""
-
 img.src="https://api.dicebear.com/7.x/avataaars/png?seed=student"
-
 error.style.display="none"
-
 }
 
 function focusSearch(){
@@ -350,21 +306,14 @@ window.scrollTo({top:0,behavior:"smooth"})
 }
 
 function saveFav(){
-
 if(!currentURL) return
-
 localStorage.setItem("favPhoto",currentURL)
-
 alert("Saved")
-
 }
 
 function toggleMode(){
-
 document.body.classList.toggle("dark")
-
 }
-
 </script>
 
 </body>
