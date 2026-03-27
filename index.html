@@ -98,6 +98,64 @@ width:100%;
 color:#ddd;
 }
 
+/* SEARCH TYPE TOGGLE */
+
+.searchType{
+display:flex;
+gap:8px;
+margin-bottom:12px;
+}
+
+.typeBtn{
+flex:1;
+padding:10px;
+border:none;
+border-radius:10px;
+background:rgba(255,255,255,0.15);
+color:rgba(255,255,255,0.7);
+font-size:14px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.typeBtn.active{
+background:rgba(255,255,255,0.35);
+color:white;
+font-weight:600;
+}
+
+/* STUDENT CARD (for name search results) */
+
+.studentCard{
+background:rgba(255,255,255,0.1);
+border-radius:12px;
+padding:12px;
+margin-bottom:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.studentCard:hover{
+background:rgba(255,255,255,0.2);
+}
+
+.studentCard .name{
+font-weight:600;
+font-size:15px;
+}
+
+.studentCard .info{
+font-size:12px;
+opacity:0.8;
+margin-top:4px;
+}
+
+.resultsCount{
+font-size:13px;
+opacity:0.7;
+margin-bottom:8px;
+}
+
 /* BUTTON */
 
 .btn{
@@ -172,6 +230,71 @@ font-size:13px;
 cursor:pointer;
 }
 
+/* DETAILS AREA */
+
+.detailsArea{
+margin-top:15px;
+display:none;
+}
+
+.detailsArea table{
+width:100%;
+border-collapse:collapse;
+border-radius:12px;
+overflow:hidden;
+}
+
+.detailsArea th,.detailsArea td{
+padding:10px 12px;
+text-align:left;
+font-size:13px;
+border-bottom:1px solid rgba(255,255,255,0.15);
+}
+
+.detailsArea th{
+background:rgba(255,255,255,0.2);
+font-weight:600;
+}
+
+.detailsArea td{
+background:rgba(255,255,255,0.1);
+}
+
+.studentHighlight{
+margin-top:12px;
+text-align:center;
+display:none;
+}
+
+.studentHighlight .highlightName{
+font-size:18px;
+font-weight:600;
+}
+
+.studentHighlight .highlightRoll{
+font-size:14px;
+opacity:0.85;
+margin-top:4px;
+}
+
+.studentHighlight .highlightBranch{
+display:inline-block;
+margin-top:6px;
+padding:4px 14px;
+background:rgba(255,255,255,0.2);
+border-radius:20px;
+font-size:13px;
+font-weight:500;
+}
+
+.loading{
+margin-top:12px;
+text-align:center;
+display:none;
+font-size:14px;
+opacity:0.8;
+}
+
 /* FOOTER NAV */
 
 .footer{
@@ -208,19 +331,36 @@ cursor:pointer;
 </select>
 </div>
 
+<!-- SEARCH TYPE -->
+<div class="searchType">
+<button class="typeBtn active" id="btnRoll" onclick="setSearchType('roll')">Roll Number</button>
+<button class="typeBtn" id="btnName" onclick="setSearchType('name')">Name</button>
+</div>
+
 <!-- SEARCH -->
 <div class="searchBox">
 🔎
-<input id="roll" placeholder="Enter Roll Number" onkeypress="if(event.key==='Enter') loadPhoto()">
+<input id="roll" placeholder="Enter Roll Number" onkeypress="if(event.key==='Enter') doSearch()">
 </div>
 
-<button class="btn" onclick="loadPhoto()">Search Photo</button>
+<button class="btn" onclick="doSearch()">Search</button>
 
 <!-- PHOTO AREA -->
 <div class="photoArea">
 <img id="photo" src="https://api.dicebear.com/7.x/avataaars/png?seed=student">
 <div class="error" id="error">Photo not found</div>
 </div>
+
+<!-- STUDENT NAME & ROLL HIGHLIGHT -->
+<div class="studentHighlight" id="studentHighlight">
+<div class="highlightName" id="highlightName"></div>
+<div class="highlightRoll" id="highlightRoll"></div>
+<div class="highlightBranch" id="highlightBranch"></div>
+</div>
+
+<!-- STUDENT DETAILS -->
+<div class="loading" id="loading">Fetching details...</div>
+<div class="detailsArea" id="detailsArea"></div>
 
 <!-- ACTIONS -->
 <div class="actions">
@@ -242,17 +382,48 @@ cursor:pointer;
 const input=document.getElementById("roll")
 const img=document.getElementById("photo")
 const error=document.getElementById("error")
+const detailsArea=document.getElementById("detailsArea")
+const loading=document.getElementById("loading")
+const studentHighlight=document.getElementById("studentHighlight")
+const highlightName=document.getElementById("highlightName")
+const highlightRoll=document.getElementById("highlightRoll")
+const highlightBranch=document.getElementById("highlightBranch")
+
+const API_URL="http://localhost:5050"
 
 let currentURL=""
+let searchType="roll"
 
 input.addEventListener("keypress", e=>{
-if(e.key==="Enter") loadPhoto()
+if(e.key==="Enter") doSearch()
 })
 
-function loadPhoto(){
-const roll=input.value.trim()
-if(!roll) return
+function setSearchType(type){
+searchType=type
+document.getElementById("btnRoll").classList.toggle("active",type==="roll")
+document.getElementById("btnName").classList.toggle("active",type==="name")
+input.placeholder=type==="roll"?"Enter Roll Number":"Enter Student or Parent Name"
+input.value=""
+clearPhoto()
+}
 
+function doSearch(){
+const val=input.value.trim()
+if(!val) return
+
+if(searchType==="roll"){
+loadPhotoByRoll(val)
+fetchDetails("rollno",val)
+}else{
+// Name search — hide photo, show all results
+img.src="https://api.dicebear.com/7.x/avataaars/png?seed=student"
+document.querySelector(".photoArea").style.display="none"
+error.style.display="none"
+fetchDetails("name",val)
+}
+}
+
+function loadPhotoByRoll(roll){
 const campus=document.getElementById("campus").value
 let url=""
 
@@ -264,6 +435,7 @@ url=`https://info.aec.edu.in/acet/StudentPhotos/${roll}.jpg`
 }
 
 currentURL=url
+document.querySelector(".photoArea").style.display="flex"
 img.src=url
 error.style.display="none"
 
@@ -275,6 +447,98 @@ img.onerror=()=>{
 error.style.display="block"
 img.src="https://api.dicebear.com/7.x/avataaars/png?seed=student"
 }
+}
+
+async function fetchDetails(type,val){
+loading.style.display="block"
+detailsArea.style.display="none"
+studentHighlight.style.display="none"
+
+try{
+const campus=document.getElementById("campus").value
+
+if(type==="name"){
+// Name search - use basic search endpoint
+const res=await fetch(`${API_URL}/api/student?name=${encodeURIComponent(val)}&campus=${campus}`)
+const data=await res.json()
+
+if(data.error){
+detailsArea.innerHTML=`<p style="text-align:center;opacity:0.7">${data.error}</p>`
+detailsArea.style.display="block"
+return
+}
+
+let html=`<div class="resultsCount">${data.students.length} student(s) found</div>`
+for(const s of data.students){
+const rollNo=s["Roll.No"]||""
+html+=`<div class="studentCard" onclick="selectStudent('${rollNo}')">
+<div class="name">${s["Student Name"]||""}</div>
+<div class="info">Roll: ${rollNo} | Parent: ${s["Parent Name"]||""}</div>
+<div class="info">Student Mobile: ${s["Student Mobile"]||""} | Parent Mobile: ${s["Parent Mobile"]||""}</div>
+</div>`
+}
+detailsArea.innerHTML=html
+detailsArea.style.display="block"
+
+}else{
+// Roll number search - use full details endpoint (exam portal login)
+const res=await fetch(`${API_URL}/api/student/full?rollno=${encodeURIComponent(val)}&campus=${campus}`)
+const data=await res.json()
+
+if(data.error){
+// Fallback to basic search if full details fail
+const res2=await fetch(`${API_URL}/api/student?rollno=${encodeURIComponent(val)}&campus=${campus}`)
+const data2=await res2.json()
+if(data2.error){
+detailsArea.innerHTML=`<p style="text-align:center;opacity:0.7">${data2.error}</p>`
+detailsArea.style.display="block"
+return
+}
+const student=data2.students[0]
+highlightName.textContent=student["Student Name"]||""
+highlightRoll.textContent=student["Roll.No"]||val
+highlightBranch.textContent=""
+studentHighlight.style.display="block"
+
+let html='<table>'
+for(const[key,v] of Object.entries(student)){
+html+=`<tr><th>${key}</th><td>${v}</td></tr>`
+}
+html+='</table>'
+detailsArea.innerHTML=html
+detailsArea.style.display="block"
+return
+}
+
+// Show name, roll & branch highlight
+highlightName.textContent=data.details["Name"]||""
+highlightRoll.textContent=data.details["Hall Ticket No"]||val
+highlightBranch.textContent=data.details["Branch"]||""
+studentHighlight.style.display="block"
+
+// Show full details
+let html='<table>'
+for(const[key,v] of Object.entries(data.details)){
+if(v) html+=`<tr><th>${key}</th><td>${v}</td></tr>`
+}
+html+='</table>'
+detailsArea.innerHTML=html
+detailsArea.style.display="block"
+}
+
+}catch(e){
+detailsArea.innerHTML='<p style="text-align:center;opacity:0.7">Could not fetch details. Make sure the server is running.</p>'
+detailsArea.style.display="block"
+}finally{
+loading.style.display="none"
+}
+}
+
+function selectStudent(roll){
+if(!roll) return
+setSearchType("roll")
+input.value=roll
+doSearch()
 }
 
 function downloadPhoto(){
@@ -295,6 +559,9 @@ function clearPhoto(){
 input.value=""
 img.src="https://api.dicebear.com/7.x/avataaars/png?seed=student"
 error.style.display="none"
+detailsArea.style.display="none"
+detailsArea.innerHTML=""
+studentHighlight.style.display="none"
 }
 
 function focusSearch(){
