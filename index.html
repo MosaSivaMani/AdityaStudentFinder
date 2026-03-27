@@ -309,6 +309,42 @@ opacity:.9;
 cursor:pointer;
 }
 
+/* DARK MODE */
+
+body.dark{
+background:linear-gradient(135deg,#1a1a2e,#16213e);
+}
+
+body.dark .app{
+background:rgba(0,0,0,0.3);
+}
+
+body.dark .searchBox,
+body.dark .campusBox select,
+body.dark .typeBtn{
+background:rgba(255,255,255,0.1);
+}
+
+body.dark .typeBtn.active{
+background:rgba(255,255,255,0.25);
+}
+
+body.dark .btn{
+background:rgba(255,255,255,0.9);
+}
+
+body.dark .actions button{
+background:rgba(255,255,255,0.15);
+}
+
+body.dark .detailsArea th{
+background:rgba(255,255,255,0.12);
+}
+
+body.dark .detailsArea td{
+background:rgba(255,255,255,0.05);
+}
+
 </style>
 
 </head>
@@ -365,7 +401,6 @@ cursor:pointer;
 <!-- ACTIONS -->
 <div class="actions">
 <button onclick="downloadPhoto()">Download</button>
-<button onclick="copyURL()">Copy Link</button>
 <button onclick="clearPhoto()">Clear</button>
 </div>
 
@@ -543,16 +578,17 @@ doSearch()
 
 function downloadPhoto(){
 if(!currentURL) return
+fetch(currentURL)
+.then(r=>r.blob())
+.then(blob=>{
+const url=URL.createObjectURL(blob)
 const a=document.createElement("a")
-a.href=currentURL
-a.download="student-photo.jpg"
+a.href=url
+a.download=input.value.trim()+".jpg"
 a.click()
-}
-
-function copyURL(){
-if(!currentURL) return
-navigator.clipboard.writeText(currentURL)
-alert("Copied")
+URL.revokeObjectURL(url)
+})
+.catch(()=>window.open(currentURL))
 }
 
 function clearPhoto(){
@@ -580,6 +616,8 @@ alert("Saved")
 
 function toggleMode(){
 document.body.classList.toggle("dark")
+const icon=document.querySelector(".icon")
+icon.textContent=document.body.classList.contains("dark")?"☀️":"🌙"
 }
 </script>
 

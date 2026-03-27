@@ -149,8 +149,6 @@ def get_student_full():
             "ctl00_cpStudCorner_txtCasteCategory": "Caste Category",
             "ctl00_cpStudCorner_txtStuEmail": "Student Email",
             "ctl00_cpStudCorner_txtParentMblNo": "Parent Mobile No",
-            "ctl00_cpStudCorner_txtAadharNo": "Aadhar No",
-            "ctl00_cpStudCorner_txtABCID": "ABC ID",
         }
 
         # Also get branch and semester from header
