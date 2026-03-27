@@ -25,6 +25,11 @@ display:flex;
 align-items:center;
 justify-content:center;
 padding:15px;
+transition:0.3s;
+}
+
+body.dark{
+background:linear-gradient(135deg,#1a1a2e,#16213e);
 }
 
 .app{
@@ -36,6 +41,10 @@ border-radius:25px;
 box-shadow:0 20px 50px rgba(0,0,0,0.3);
 padding:20px;
 color:white;
+}
+
+body.dark .app{
+background:rgba(0,0,0,0.3);
 }
 
 /* HEADER */
@@ -55,7 +64,15 @@ font-weight:600;
 .icon{
 cursor:pointer;
 font-size:20px;
+width:38px;height:38px;
+display:flex;align-items:center;justify-content:center;
+background:rgba(255,255,255,0.15);
+border-radius:50%;
+transition:transform 0.3s, background 0.3s;
 }
+
+.icon:hover{background:rgba(255,255,255,0.25);}
+.icon:active{transform:rotate(180deg) scale(0.9);}
 
 /* CAMPUS SELECTOR */
 
@@ -72,30 +89,6 @@ background:rgba(255,255,255,0.2);
 color:white;
 font-size:15px;
 outline:none;
-}
-
-/* SEARCH */
-
-.searchBox{
-background:rgba(255,255,255,0.2);
-padding:12px;
-border-radius:12px;
-display:flex;
-align-items:center;
-gap:10px;
-}
-
-.searchBox input{
-background:none;
-border:none;
-outline:none;
-color:white;
-font-size:15px;
-width:100%;
-}
-
-.searchBox input::placeholder{
-color:#ddd;
 }
 
 /* SEARCH TYPE TOGGLE */
@@ -124,36 +117,28 @@ color:white;
 font-weight:600;
 }
 
-/* STUDENT CARD (for name search results) */
+/* SEARCH */
 
-.studentCard{
-background:rgba(255,255,255,0.1);
-border-radius:12px;
-padding:12px;
-margin-bottom:10px;
-cursor:pointer;
-transition:0.2s;
-}
-
-.studentCard:hover{
+.searchBox{
 background:rgba(255,255,255,0.2);
+padding:12px;
+border-radius:12px;
+display:flex;
+align-items:center;
+gap:10px;
 }
 
-.studentCard .name{
-font-weight:600;
+.searchBox input{
+background:none;
+border:none;
+outline:none;
+color:white;
 font-size:15px;
+width:100%;
 }
 
-.studentCard .info{
-font-size:12px;
-opacity:0.8;
-margin-top:4px;
-}
-
-.resultsCount{
-font-size:13px;
-opacity:0.7;
-margin-bottom:8px;
+.searchBox input::placeholder{
+color:#ddd;
 }
 
 /* BUTTON */
@@ -166,9 +151,26 @@ border:none;
 border-radius:12px;
 background:white;
 color:#333;
-font-weight:500;
+font-weight:600;
 font-size:15px;
 cursor:pointer;
+transition:transform 0.15s, box-shadow 0.15s;
+position:relative;
+overflow:hidden;
+}
+
+.btn:hover{
+transform:translateY(-1px);
+box-shadow:0 6px 20px rgba(0,0,0,0.2);
+}
+
+.btn:active{
+transform:translateY(0) scale(0.98);
+}
+
+.btn.searching{
+pointer-events:none;
+opacity:0.8;
 }
 
 /* PHOTO AREA */
@@ -188,19 +190,14 @@ max-width:100%;
 max-height:260px;
 object-fit:contain;
 border-radius:18px;
-box-shadow:0 10px 25px rgba(0,0,0,0.35);
+box-shadow:0 10px 30px rgba(0,0,0,0.4);
+border:3px solid rgba(255,255,255,0.2);
+transition:box-shadow 0.3s, border-color 0.3s;
 }
 
-/* PLACEHOLDER */
-
-.placeholder{
-text-align:center;
-opacity:0.8;
-font-size:15px;
-}
-
-.placeholder p{
-margin-top:10px;
+.photoArea img:hover{
+box-shadow:0 12px 35px rgba(102,126,234,0.4);
+border-color:rgba(255,255,255,0.4);
 }
 
 /* ERROR */
@@ -211,23 +208,44 @@ color:#ffd3d3;
 display:none;
 }
 
-/* ACTION BUTTONS */
+/* STUDENT HIGHLIGHT */
 
-.actions{
-margin-top:18px;
-display:flex;
-gap:8px;
+.studentHighlight{
+margin-top:12px;
+text-align:center;
+display:none;
 }
 
-.actions button{
-flex:1;
-padding:12px;
-border:none;
-border-radius:10px;
-background:rgba(255,255,255,0.25);
-color:white;
+.studentHighlight .highlightName{
+font-size:18px;
+font-weight:600;
+}
+
+.studentHighlight .highlightRoll{
+font-size:14px;
+opacity:0.85;
+margin-top:4px;
+}
+
+.studentHighlight .highlightBranch{
+display:inline-block;
+margin-top:6px;
+padding:4px 14px;
+background:rgba(255,255,255,0.2);
+border-radius:20px;
 font-size:13px;
-cursor:pointer;
+font-weight:500;
+}
+
+.studentHighlight .highlightSem{
+display:inline-block;
+margin-top:6px;
+margin-left:4px;
+padding:4px 14px;
+background:rgba(255,255,255,0.2);
+border-radius:20px;
+font-size:13px;
+font-weight:500;
 }
 
 /* DETAILS AREA */
@@ -260,40 +278,116 @@ font-weight:600;
 background:rgba(255,255,255,0.1);
 }
 
-.studentHighlight{
-margin-top:12px;
-text-align:center;
-display:none;
+body.dark .detailsArea th{background:rgba(255,255,255,0.12);}
+body.dark .detailsArea td{background:rgba(255,255,255,0.05);}
+
+/* STUDENT CARDS */
+
+.studentCard{
+background:rgba(255,255,255,0.1);
+border-radius:12px;
+padding:12px;
+margin-bottom:10px;
+cursor:pointer;
+transition:0.2s;
 }
 
-.studentHighlight .highlightName{
-font-size:18px;
+.studentCard:hover{
+background:rgba(255,255,255,0.2);
+}
+
+.studentCard .name{
 font-weight:600;
+font-size:15px;
 }
 
-.studentHighlight .highlightRoll{
-font-size:14px;
-opacity:0.85;
+.studentCard .info{
+font-size:12px;
+opacity:0.8;
 margin-top:4px;
 }
 
-.studentHighlight .highlightBranch{
-display:inline-block;
-margin-top:6px;
-padding:4px 14px;
-background:rgba(255,255,255,0.2);
-border-radius:20px;
+.resultsCount{
 font-size:13px;
-font-weight:500;
+opacity:0.7;
+margin-bottom:8px;
 }
 
-.loading{
-margin-top:12px;
+/* NOT FOUND */
+
+.notFound{
+margin-top:20px;
 text-align:center;
 display:none;
-font-size:14px;
-opacity:0.8;
+padding:20px;
+background:rgba(255,100,100,0.15);
+border-radius:14px;
 }
+
+.notFound .nfIcon{font-size:36px;margin-bottom:8px;}
+.notFound .nfText{font-size:15px;font-weight:500;}
+.notFound .nfSub{font-size:12px;opacity:0.7;margin-top:4px;}
+
+/* LOADING */
+
+.loading{
+margin-top:16px;
+text-align:center;
+display:none;
+padding:20px;
+}
+
+.loadingSpinner{
+display:inline-block;
+width:32px;height:32px;
+border:3px solid rgba(255,255,255,0.2);
+border-top-color:#fff;
+border-radius:50%;
+animation:spin 0.7s linear infinite;
+}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.loadingText{
+margin-top:10px;
+font-size:13px;
+opacity:0.7;
+}
+
+/* OFFLINE BANNER */
+
+.offlineBanner{
+display:none;
+padding:8px 14px;
+background:rgba(255,180,50,0.2);
+border-radius:10px;
+font-size:12px;
+text-align:center;
+margin-bottom:12px;
+}
+
+.offlineBanner span{opacity:0.9;}
+
+/* ACTION BUTTONS */
+
+.actions{
+margin-top:18px;
+display:flex;
+gap:8px;
+}
+
+.actions button{
+flex:1;
+padding:12px;
+border:none;
+border-radius:10px;
+background:rgba(255,255,255,0.25);
+color:white;
+font-size:13px;
+cursor:pointer;
+}
+
+body.dark .actions button{background:rgba(255,255,255,0.15);}
 
 /* FOOTER NAV */
 
@@ -309,42 +403,6 @@ opacity:.9;
 cursor:pointer;
 }
 
-/* DARK MODE */
-
-body.dark{
-background:linear-gradient(135deg,#1a1a2e,#16213e);
-}
-
-body.dark .app{
-background:rgba(0,0,0,0.3);
-}
-
-body.dark .searchBox,
-body.dark .campusBox select,
-body.dark .typeBtn{
-background:rgba(255,255,255,0.1);
-}
-
-body.dark .typeBtn.active{
-background:rgba(255,255,255,0.25);
-}
-
-body.dark .btn{
-background:rgba(255,255,255,0.9);
-}
-
-body.dark .actions button{
-background:rgba(255,255,255,0.15);
-}
-
-body.dark .detailsArea th{
-background:rgba(255,255,255,0.12);
-}
-
-body.dark .detailsArea td{
-background:rgba(255,255,255,0.05);
-}
-
 </style>
 
 </head>
@@ -355,8 +413,13 @@ background:rgba(255,255,255,0.05);
 
 <!-- HEADER -->
 <div class="header">
-<div class="title">🎓 Student Finder</div>
+<div class="title">Student Finder</div>
 <div class="icon" onclick="toggleMode()">🌙</div>
+</div>
+
+<!-- OFFLINE BANNER -->
+<div class="offlineBanner" id="offlineBanner">
+<span>You're offline. Showing cached results.</span>
 </div>
 
 <!-- CAMPUS SELECTOR -->
@@ -387,16 +450,32 @@ background:rgba(255,255,255,0.05);
 <div class="error" id="error">Photo not found</div>
 </div>
 
-<!-- STUDENT NAME & ROLL HIGHLIGHT -->
+<!-- STUDENT HIGHLIGHT -->
 <div class="studentHighlight" id="studentHighlight">
 <div class="highlightName" id="highlightName"></div>
 <div class="highlightRoll" id="highlightRoll"></div>
-<div class="highlightBranch" id="highlightBranch"></div>
+<div>
+<span class="highlightBranch" id="highlightBranch"></span>
+<span class="highlightSem" id="highlightSem"></span>
+</div>
+</div>
+
+<!-- NOT FOUND -->
+<div class="notFound" id="notFound">
+<div class="nfIcon">😕</div>
+<div class="nfText" id="nfText">Student Not Found</div>
+<div class="nfSub" id="nfSub">Check the roll number and campus, then try again</div>
 </div>
 
 <!-- STUDENT DETAILS -->
-<div class="loading" id="loading">Fetching details...</div>
+<div class="loading" id="loading">
+<div class="loadingSpinner"></div>
+<div class="loadingText">Fetching student details...</div>
+</div>
 <div class="detailsArea" id="detailsArea"></div>
+
+<!-- NAME SEARCH RESULTS -->
+<div id="nameResults"></div>
 
 <!-- ACTIONS -->
 <div class="actions">
@@ -408,7 +487,6 @@ background:rgba(255,255,255,0.05);
 <div class="footer">
 <div onclick="goHome()">🏠 Home</div>
 <div onclick="focusSearch()">🔍 Search</div>
-<div onclick="saveFav()">⭐ Save</div>
 </div>
 
 </div>
@@ -418,20 +496,21 @@ const input=document.getElementById("roll")
 const img=document.getElementById("photo")
 const error=document.getElementById("error")
 const detailsArea=document.getElementById("detailsArea")
+const nameResults=document.getElementById("nameResults")
 const loading=document.getElementById("loading")
 const studentHighlight=document.getElementById("studentHighlight")
 const highlightName=document.getElementById("highlightName")
 const highlightRoll=document.getElementById("highlightRoll")
 const highlightBranch=document.getElementById("highlightBranch")
+const highlightSem=document.getElementById("highlightSem")
 
 const API_URL="https://kiran3139-adityastudentfinder.hf.space"
+const notFound=document.getElementById("notFound")
+const offlineBanner=document.getElementById("offlineBanner")
+const searchBtn=document.querySelector(".btn")
 
 let currentURL=""
 let searchType="roll"
-
-input.addEventListener("keypress", e=>{
-if(e.key==="Enter") doSearch()
-})
 
 function setSearchType(type){
 searchType=type
@@ -443,96 +522,85 @@ clearPhoto()
 }
 
 function doSearch(){
-const val=input.value.trim()
+const val=input.value.trim().toUpperCase()
 if(!val) return
 
+notFound.style.display="none"
+offlineBanner.style.display="none"
+searchBtn.textContent="Searching..."
+searchBtn.classList.add("searching")
+
+const campus=document.getElementById("campus").value
+
 if(searchType==="roll"){
-loadPhotoByRoll(val)
-fetchDetails("rollno",val)
+loadPhotoByRoll(val,campus)
+fetchDetails("rollno",val,campus)
 }else{
-// Name search — hide photo, show all results
 img.src="https://api.dicebear.com/7.x/avataaars/png?seed=student"
 document.querySelector(".photoArea").style.display="none"
 error.style.display="none"
-fetchDetails("name",val)
+studentHighlight.style.display="none"
+fetchDetails("name",val,campus)
 }
 }
 
-function loadPhotoByRoll(roll){
-const campus=document.getElementById("campus").value
+function resetBtn(){
+searchBtn.textContent="Search"
+searchBtn.classList.remove("searching")
+}
+
+function loadPhotoByRoll(roll,campus){
 let url=""
-
-if(campus==="aec"){
-url=`https://info.aec.edu.in/aec/StudentPhotos/${roll}.jpg`
-}
-if(campus==="acet"){
-url=`https://info.aec.edu.in/acet/StudentPhotos/${roll}.jpg`
-}
+if(campus==="aec") url=`https://info.aec.edu.in/aec/StudentPhotos/${roll}.jpg`
+if(campus==="acet") url=`https://info.aec.edu.in/acet/StudentPhotos/${roll}.jpg`
 
 currentURL=url
 document.querySelector(".photoArea").style.display="flex"
 img.src=url
 error.style.display="none"
 
-img.onload=()=>{
-error.style.display="none"
-}
-
+img.onload=()=>{error.style.display="none"}
 img.onerror=()=>{
 error.style.display="block"
 img.src="https://api.dicebear.com/7.x/avataaars/png?seed=student"
 }
 }
 
-async function fetchDetails(type,val){
-loading.style.display="block"
+function cacheKey(type,val,campus){return `cache_${type}_${val}_${campus}`}
+
+function saveCache(type,val,campus,data){
+try{localStorage.setItem(cacheKey(type,val,campus),JSON.stringify(data))}catch(e){}
+}
+
+function getCache(type,val,campus){
+try{
+const d=localStorage.getItem(cacheKey(type,val,campus))
+return d?JSON.parse(d):null
+}catch(e){return null}
+}
+
+function showNotFound(type){
+const nfText=document.getElementById("nfText")
+const nfSub=document.getElementById("nfSub")
+if(type==="name"){
+nfText.textContent="Nobody Found! 👻"
+nfSub.innerHTML="Bhai spelling toh check kar! 😅<br>Ya phir wo banda college join hi nahi kiya 🤷‍♂️<br>Try shorter name — like just surname!"
+}else{
+nfText.textContent="Oops! No Student Found 🫣"
+nfSub.innerHTML="Roll number yaad nahi? 😂 Koi baat nahi yaar!<br>👉 Switch to <b>Name</b> search — stalking made easy! 🕵️‍♂️"
+}
+notFound.style.display="block"
 detailsArea.style.display="none"
 studentHighlight.style.display="none"
-
-try{
-const campus=document.getElementById("campus").value
-
-if(type==="name"){
-// Name search - use basic search endpoint
-const res=await fetch(`${API_URL}/api/student?name=${encodeURIComponent(val)}&campus=${campus}`)
-const data=await res.json()
-
-if(data.error){
-detailsArea.innerHTML=`<p style="text-align:center;opacity:0.7">${data.error}</p>`
-detailsArea.style.display="block"
-return
 }
 
-let html=`<div class="resultsCount">${data.students.length} student(s) found</div>`
-for(const s of data.students){
-const rollNo=s["Roll.No"]||""
-html+=`<div class="studentCard" onclick="selectStudent('${rollNo}')">
-<div class="name">${s["Student Name"]||""}</div>
-<div class="info">Roll: ${rollNo} | Parent: ${s["Parent Name"]||""}</div>
-<div class="info">Student Mobile: ${s["Student Mobile"]||""} | Parent Mobile: ${s["Parent Mobile"]||""}</div>
-</div>`
-}
-detailsArea.innerHTML=html
-detailsArea.style.display="block"
-
-}else{
-// Roll number search - use full details endpoint (exam portal login)
-const res=await fetch(`${API_URL}/api/student/full?rollno=${encodeURIComponent(val)}&campus=${campus}`)
-const data=await res.json()
-
-if(data.error){
-// Fallback to basic search if full details fail
-const res2=await fetch(`${API_URL}/api/student?rollno=${encodeURIComponent(val)}&campus=${campus}`)
-const data2=await res2.json()
-if(data2.error){
-detailsArea.innerHTML=`<p style="text-align:center;opacity:0.7">${data2.error}</p>`
-detailsArea.style.display="block"
-return
-}
-const student=data2.students[0]
+function showStudentDetails(student,val){
 highlightName.textContent=student["Student Name"]||""
 highlightRoll.textContent=student["Roll.No"]||val
 highlightBranch.textContent=""
+highlightBranch.style.display="none"
+highlightSem.textContent=""
+highlightSem.style.display="none"
 studentHighlight.style.display="block"
 
 let html='<table>'
@@ -542,18 +610,23 @@ html+=`<tr><th>${key}</th><td>${v}</td></tr>`
 html+='</table>'
 detailsArea.innerHTML=html
 detailsArea.style.display="block"
-return
 }
 
-// Show name, roll & branch highlight
-highlightName.textContent=data.details["Name"]||""
-highlightRoll.textContent=data.details["Hall Ticket No"]||val
-highlightBranch.textContent=data.details["Branch"]||""
+function showFullDetails(details,val){
+highlightName.textContent=details["Name"]||""
+highlightRoll.textContent=details["Hall Ticket No"]||val
+if(details["Branch"]){
+highlightBranch.textContent=details["Branch"]
+highlightBranch.style.display="inline-block"
+}
+if(details["Semester"]){
+highlightSem.textContent=details["Semester"]
+highlightSem.style.display="inline-block"
+}
 studentHighlight.style.display="block"
 
-// Show full details
 let html='<table>'
-for(const[key,v] of Object.entries(data.details)){
+for(const[key,v] of Object.entries(details)){
 if(v) html+=`<tr><th>${key}</th><td>${v}</td></tr>`
 }
 html+='</table>'
@@ -561,11 +634,77 @@ detailsArea.innerHTML=html
 detailsArea.style.display="block"
 }
 
+function showNameResults(students){
+let html=`<div class="resultsCount">${students.length} student(s) found</div>`
+for(const s of students){
+const rollNo=s["Roll.No"]||""
+html+=`<div class="studentCard" onclick="selectStudent('${rollNo}')">
+<div class="name">${s["Student Name"]||""}</div>
+<div class="info">Roll: ${rollNo} | Parent: ${s["Parent Name"]||""}</div>
+<div class="info">Mobile: ${s["Student Mobile"]||""} | Parent: ${s["Parent Mobile"]||""}</div>
+</div>`
+}
+nameResults.innerHTML=html
+}
+
+async function fetchDetails(type,val,campus){
+loading.style.display="block"
+detailsArea.style.display="none"
+nameResults.innerHTML=""
+studentHighlight.style.display="none"
+notFound.style.display="none"
+
+try{
+if(type==="name"){
+const res=await fetch(`${API_URL}/api/student?name=${encodeURIComponent(val)}&campus=${campus}`)
+const data=await res.json()
+
+if(data.error){
+showNotFound("name")
+return
+}
+
+saveCache(type,val,campus,data)
+showNameResults(data.students)
+
+}else{
+const res=await fetch(`${API_URL}/api/student/full?rollno=${encodeURIComponent(val)}&campus=${campus}`)
+const data=await res.json()
+
+if(data.error){
+const res2=await fetch(`${API_URL}/api/student?rollno=${encodeURIComponent(val)}&campus=${campus}`)
+const data2=await res2.json()
+if(data2.error){
+showNotFound("roll")
+return
+}
+saveCache(type,val,campus,{type:"basic",students:data2.students})
+showStudentDetails(data2.students[0],val)
+return
+}
+
+saveCache(type,val,campus,{type:"full",details:data.details})
+showFullDetails(data.details,val)
+}
+
 }catch(e){
-detailsArea.innerHTML='<p style="text-align:center;opacity:0.7">Could not fetch details. Make sure the server is running.</p>'
-detailsArea.style.display="block"
+// Offline — try cache
+const cached=getCache(type,val,campus)
+if(cached){
+offlineBanner.style.display="block"
+if(type==="name"&&cached.students){
+showNameResults(cached.students)
+}else if(cached.type==="full"){
+showFullDetails(cached.details,val)
+}else if(cached.type==="basic"){
+showStudentDetails(cached.students[0],val)
+}
+}else{
+showNotFound(type==="name"?"name":"roll")
+}
 }finally{
 loading.style.display="none"
+resetBtn()
 }
 }
 
@@ -577,18 +716,14 @@ doSearch()
 }
 
 function downloadPhoto(){
-if(!currentURL) return
-fetch(currentURL)
-.then(r=>r.blob())
-.then(blob=>{
-const url=URL.createObjectURL(blob)
+const roll=input.value.trim().toUpperCase()
+if(!roll) return
+const campus=document.getElementById("campus").value
+const url=`${API_URL}/api/photo?rollno=${encodeURIComponent(roll)}&campus=${campus}`
 const a=document.createElement("a")
 a.href=url
-a.download=input.value.trim()+".jpg"
+a.download=roll+".jpg"
 a.click()
-URL.revokeObjectURL(url)
-})
-.catch(()=>window.open(currentURL))
 }
 
 function clearPhoto(){
@@ -597,27 +732,29 @@ img.src="https://api.dicebear.com/7.x/avataaars/png?seed=student"
 error.style.display="none"
 detailsArea.style.display="none"
 detailsArea.innerHTML=""
+nameResults.innerHTML=""
 studentHighlight.style.display="none"
+notFound.style.display="none"
+offlineBanner.style.display="none"
+document.querySelector(".photoArea").style.display="flex"
+currentURL=""
+resetBtn()
 }
 
-function focusSearch(){
-input.focus()
-}
-
-function goHome(){
-window.scrollTo({top:0,behavior:"smooth"})
-}
-
-function saveFav(){
-if(!currentURL) return
-localStorage.setItem("favPhoto",currentURL)
-alert("Saved")
-}
+function focusSearch(){input.focus()}
+function goHome(){window.scrollTo({top:0,behavior:"smooth"})}
 
 function toggleMode(){
 document.body.classList.toggle("dark")
 const icon=document.querySelector(".icon")
 icon.textContent=document.body.classList.contains("dark")?"☀️":"🌙"
+localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"light")
+}
+
+// Restore saved theme
+if(localStorage.getItem("theme")==="dark"){
+document.body.classList.add("dark")
+document.querySelector(".icon").textContent="☀️"
 }
 </script>
 
